@@ -15,7 +15,7 @@ import { TimetableModule } from './timetable/timetable.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'yourpass',
+      password: 'your password',
       database: 'timetable_db',
       entities: [Activity, ActivitySession],
       synchronize: true,
