@@ -9,7 +9,6 @@ import {
   Redirect,
 } from '@nestjs/common';
 import { TimetableService } from './timetable.service';
-import { CompleteSessionDto } from './dtos/complete-session.dto';
 
 @Controller('timetable')
 export class TimetableController {
@@ -18,13 +17,10 @@ export class TimetableController {
   @Get()
   @Render('index')
   async home() {
-    const [activities, currentActivity, activeSession, todaysSessions] =
-      await Promise.all([
-        this.timetableService.getAllActivities(),
-        this.timetableService.getCurrentActivity(),
-        this.timetableService.getActiveSession(),
-        this.timetableService.getTodaysSessions(),
-      ]);
+    const [activities, currentActivity] = await Promise.all([
+      this.timetableService.getAllActivities(),
+      this.timetableService.getCurrentActivity(),
+    ]);
 
     const days = [
       'Sunday',
@@ -48,8 +44,6 @@ export class TimetableController {
       timetable,
       days,
       currentActivity,
-      activeSession,
-      todaysSessions,
       now: new Date(),
     };
   }
@@ -73,20 +67,5 @@ export class TimetableController {
     @Body() body: any,
   ) {
     await this.timetableService.updateActivity(id, body);
-  }
-
-  @Post('sessions/start/:activityId')
-  @Redirect('/timetable')
-  async startSession(@Param('activityId', ParseIntPipe) activityId: number) {
-    await this.timetableService.startSession(activityId);
-  }
-
-  @Post('sessions/:id/complete')
-  @Redirect('/timetable')
-  async completeSession(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: CompleteSessionDto,
-  ) {
-    await this.timetableService.completeSession(id, body.learnings, body.notes);
   }
 }

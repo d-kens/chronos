@@ -1,18 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ActivitySession } from 'src/entities/activity-session.enetity';
 import { Activity } from 'src/entities/activity.enetity';
-import { Repository, Between } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ActivityDto } from './dtos/activity.dto';
-import { ActivitySessionDto } from './dtos/activity-session.dto';
 
 @Injectable()
 export class TimetableService {
   constructor(
     @InjectRepository(Activity)
     private activityRepository: Repository<Activity>,
-    @InjectRepository(ActivitySession)
-    private sessionRepository: Repository<ActivitySession>,
   ) {}
 
   // Helper method to format time (remove seconds)
@@ -37,23 +33,6 @@ export class TimetableService {
       isActive: activity.isActive,
       createdAt: activity.createdAt,
       updatedAt: activity.updatedAt,
-    };
-  }
-
-  // Convert ActivitySession entity to DTO
-  private toSessionDto(session: ActivitySession): ActivitySessionDto {
-    return {
-      id: session.id,
-      activityId: session.activityId,
-      sessionDate: session.sessionDate,
-      actualStartTime: this.formatTime(session.actualStartTime),
-      actualEndTime: session.actualEndTime
-        ? this.formatTime(session.actualEndTime)
-        : null,
-      learnings: session.learnings,
-      notes: session.notes,
-      completed: session.completed,
-      createdAt: session.createdAt,
     };
   }
 
@@ -124,67 +103,5 @@ export class TimetableService {
       .getOne();
 
     return activity ? this.toActivityDto(activity) : null;
-  }
-
-  async startSession(activityId: number): Promise<ActivitySessionDto> {
-    const now = new Date();
-    const session = this.sessionRepository.create({
-      activityId,
-      sessionDate: now,
-      actualStartTime: now as unknown as Date,
-      completed: false,
-    });
-    const saved = await this.sessionRepository.save(session);
-    return this.toSessionDto(saved);
-  }
-
-  async completeSession(
-    sessionId: number,
-    learnings: string,
-    notes?: string,
-  ): Promise<ActivitySessionDto> {
-    const session = await this.sessionRepository.findOne({
-      where: { id: sessionId },
-      relations: ['activity'],
-    });
-
-    if (!session) {
-      throw new NotFoundException(`Session ${sessionId} not found`);
-    }
-
-    session.actualEndTime = new Date() as unknown as Date;
-    session.learnings = learnings;
-    session.notes = notes;
-    session.completed = true;
-
-    const saved = await this.sessionRepository.save(session);
-    return this.toSessionDto(saved);
-  }
-
-  async getActiveSession(): Promise<ActivitySessionDto | null> {
-    const session = await this.sessionRepository.findOne({
-      where: { completed: false },
-      relations: ['activity'],
-      order: { createdAt: 'DESC' },
-    });
-
-    return session ? this.toSessionDto(session) : null;
-  }
-
-  async getTodaysSessions(): Promise<ActivitySessionDto[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const sessions = await this.sessionRepository.find({
-      where: {
-        sessionDate: Between(today, tomorrow),
-      },
-      relations: ['activity'],
-      order: { sessionDate: 'DESC' },
-    });
-
-    return sessions.map((session) => this.toSessionDto(session));
   }
 }

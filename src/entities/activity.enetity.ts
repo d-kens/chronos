@@ -6,7 +6,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ActivitySession } from './activity-session.enetity';
 
 @Entity('activities')
 export class Activity {
@@ -27,9 +26,6 @@ export class Activity {
 
   @Column({ default: true })
   isActive: boolean;
-
-  @OneToMany(() => ActivitySession, (session) => session.activity)
-  sessions: ActivitySession[];
 
   @CreateDateColumn()
   createdAt: Date;
