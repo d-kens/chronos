@@ -25,7 +25,7 @@ export class ActivitySession {
   sessionDate: Date;
 
   @Column({ type: 'time' })
-  actualStartTime: string;
+  actualStartTime: Date;
 
   @Column({ type: 'time', nullable: true })
   actualEndTime: Date;

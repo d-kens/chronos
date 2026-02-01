@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Query,
   Render,
   ParseIntPipe,
   Redirect,
@@ -16,7 +15,6 @@ import { CompleteSessionDto } from './dtos/complete-session.dto';
 export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 
-  // Home page: timetable + current activity + today's sessions
   @Get()
   @Render('index')
   async home() {
@@ -56,21 +54,18 @@ export class TimetableController {
     };
   }
 
-  // Create activity
   @Post('activities')
   @Redirect('/timetable')
   async createActivity(@Body() body: any) {
     await this.timetableService.createActivity(body);
   }
 
-  // Delete activity
   @Post('activities/:id/delete')
   @Redirect('/timetable')
   async deleteActivity(@Param('id', ParseIntPipe) id: number) {
     await this.timetableService.deleteActivity(id);
   }
 
-  // Update activity
   @Post('activities/:id/edit')
   @Redirect('/timetable')
   async updateActivity(
@@ -80,14 +75,12 @@ export class TimetableController {
     await this.timetableService.updateActivity(id, body);
   }
 
-  // Start session
   @Post('sessions/start/:activityId')
   @Redirect('/timetable')
   async startSession(@Param('activityId', ParseIntPipe) activityId: number) {
     await this.timetableService.startSession(activityId);
   }
 
-  // Complete session
   @Post('sessions/:id/complete')
   @Redirect('/timetable')
   async completeSession(

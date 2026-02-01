@@ -17,10 +17,10 @@ export class Activity {
   day: string; // Sunday, Monday, etc.
 
   @Column({ type: 'time' })
-  startTime: string;
+  startTime: Date;
 
   @Column({ type: 'time' })
-  endTime: string;
+  endTime: Date;
 
   @Column({ type: 'text' })
   activity: string;
