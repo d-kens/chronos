@@ -6,8 +6,8 @@
 
     {{#if activeSession}}
       <div class="session-form">
-        <h4 style="color: #333; margin-bottom: 15px;">Session in Progress</h4>
-        <p style="color:#666;">Started at: {{activeSession.actualStartTime}}</p>
+        <h4>Session in Progress</h4>
+        <p>Started at: {{activeSession.actualStartTime}}</p>
         <form method="POST" action="/timetable/sessions/{{activeSession.id}}/complete">
           <textarea name="learnings" placeholder="What did you learn?" required></textarea>
           <textarea name="notes" placeholder="Additional notes (optional)"></textarea>
@@ -22,23 +22,21 @@
   </div>
 {{/if}}
 
-{{#if todaysSessions.length}}
-  <div class="card" style="margin-bottom:30px;">
-    <h3>Today's Completed Sessions</h3>
-    {{#each todaysSessions}}
-      {{#if this.completed}}
-        <div style="margin:10px 0; padding:10px; background:white; border-radius:6px;">
-          <strong>{{this.activity.activity}}</strong>
-          <p style="color:#666;font-size:0.9em;">{{this.actualStartTime}} - {{this.actualEndTime}}</p>
-          {{#if this.learnings}}<p><em>Learnings: {{this.learnings}}</em></p>{{/if}}
-        </div>
-      {{/if}}
-    {{/each}}
-  </div>
-{{/if}}
+<div class="card">
+  <h3>Today's Completed Sessions</h3>
+  {{#each todaysSessions}}
+    {{#if this.completed}}
+      <div class="session-card">
+        <strong>{{this.activity.activity}}</strong>
+        <p class="time">{{this.actualStartTime}} - {{this.actualEndTime}}</p>
+        {{#if this.learnings}}<p><em>Learnings: {{this.learnings}}</em></p>{{/if}}
+      </div>
+    {{/if}}
+  {{/each}}
+</div>
 
-<div style="background:#f8f9fa;padding:20px;border-radius:10px;margin-bottom:30px;">
-  <h2 style="margin-bottom:20px;">Add New Activity</h2>
+<div class="card">
+  <h2>Add New Activity</h2>
   <form method="POST" action="/timetable/activities">
     <div class="grid">
       <div>
@@ -66,32 +64,33 @@
   </form>
 </div>
 
-<h2 style="margin-bottom:20px;">Weekly Timetable</h2>
+<h2>Weekly Timetable</h2>
 <table>
   <thead>
   <tr>
     <th>Day</th>
-    <th>Time</th>
-    <th>Activity</th>
-    <th>Actions</th>
+    <th>Activities</th>
   </tr>
   </thead>
   <tbody>
   {{#each days}}
-    {{#with (lookup ../timetable this)}}
-      {{#each this}}
-        <tr>
-          <td><strong>{{@../index}}</strong></td>
-          <td class="time">{{this.startTime}} - {{this.endTime}}</td>
-          <td>{{this.activity}}</td>
-          <td>
-            <form method="POST" action="/timetable/activities/{{this.id}}/delete">
-              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-            </form>
-          </td>
-        </tr>
-      {{/each}}
-    {{/with}}
+    <tr>
+      <td><strong>{{this}}</strong></td>
+      <td>
+        <div class="activities-container">
+          {{#with (lookup ../timetable this)}}
+            {{#each this}}
+              <div class="activity-card">
+                <strong>{{this.activity}}</strong>
+                <p class="time">{{this.startTime}} - {{this.endTime}}</p>
+              </div>
+            {{/each}}
+          {{else}}
+            <p class="no-activity">No activities</p>
+          {{/with}}
+        </div>
+      </td>
+    </tr>
   {{/each}}
   </tbody>
 </table>
