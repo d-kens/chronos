@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Task } from './task.entity';
 
 @Entity('activities')
 export class Activity {
@@ -32,4 +33,7 @@ export class Activity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Task, (task) => task.activity)
+  tasks: Task[];
 }

@@ -21,6 +21,47 @@
               <div class="activity-card">
                 <p class="time">{{this.startTime}} - {{this.endTime}}</p>
                 <p class="activity">{{this.activity}}</p>
+                <div class="activity-actions">
+                  <div class="task-info">
+                    <p class="task-label">Tasks</p>
+                    <a class="task-counter" href="/timetable/activities/{{this.id}}/tasks">{{this.tasks.length}}</a>
+                  </div>
+                  <a class="add-task-btn" href="/timetable/activities/{{this.id}}/tasks" aria-label="Add task">＋</a>
+                </div>
+              </div>
+
+              <!-- hidden panel for task modal (copied into modal on open) -->
+              <div id="task-panel-{{this.id}}" class="hidden">
+                <div style="padding:18px 4px;">
+                  <h3 style="margin-bottom:6px">{{this.activity}}</h3>
+                  <p class="time" style="margin-bottom:8px">{{this.startTime}} - {{this.endTime}}</p>
+                  {{#if this.tasks}}
+                    <ol class="task-list">
+                      {{#each this.tasks}}
+                        <li class="task-item {{#if isDone}}done{{/if}}">
+                          <span class="task-desc">{{description}}</span>
+                          <span class="task-actions">
+                            {{#unless isDone}}
+                              <form method="POST" action="/timetable/tasks/{{this.id}}/complete" style="display:inline">
+                                <button type="submit" class="task-action-btn">Complete</button>
+                              </form>
+                              <form method="POST" action="/timetable/tasks/{{this.id}}/carry" style="display:inline">
+                                <button type="submit" class="task-action-btn">Carry</button>
+                              </form>
+                            {{/unless}}
+                          </span>
+                        </li>
+                      {{/each}}
+                    </ol>
+                  {{else}}
+                    <p class="no-tasks">No tasks</p>
+                  {{/if}}
+
+                  <form method="POST" action="/timetable/activities/{{this.id}}/tasks" class="task-form">
+                    <input type="text" name="description" placeholder="Add task..." required>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                  </form>
+                </div>
               </div>
             {{/each}}
           {{else}}
@@ -71,6 +112,17 @@
   </div>
 </div>
 
+<!-- Task Modal (reusable) -->
+<div id="taskModal" class="modal task-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Tasks</h2>
+      <span class="close" onclick="closeTaskModal()">&times;</span>
+    </div>
+    <div id="taskModalBody" class="modal-body"></div>
+  </div>
+</div>
+
 <script>
   function openModal() {
     document.getElementById('activityModal').style.display = 'flex';
@@ -82,9 +134,13 @@
 
   // Close modal when clicking outside
   window.onclick = function(event) {
-    const modal = document.getElementById('activityModal');
-    if (event.target === modal) {
+    const activityModal = document.getElementById('activityModal');
+    const taskModal = document.getElementById('taskModal');
+    if (event.target === activityModal) {
       closeModal();
+    }
+    if (event.target === taskModal) {
+      closeTaskModal();
     }
   }
 
@@ -92,6 +148,28 @@
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
       closeModal();
+      closeTaskModal();
     }
   });
+  function openTaskModal(panelId, focusInput) {
+    const panel = document.getElementById(panelId);
+    const modal = document.getElementById('taskModal');
+    const body = document.getElementById('taskModalBody');
+    if (!panel || !body || !modal) return;
+    body.innerHTML = panel.innerHTML;
+    modal.style.display = 'flex';
+    if (focusInput) {
+      // wait for DOM insert then focus input
+      setTimeout(() => {
+        const input = body.querySelector('input[name="description"]');
+        if (input) input.focus();
+      }, 50);
+    }
+  }
+
+  function closeTaskModal() {
+    const modal = document.getElementById('taskModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+  }
 </script>

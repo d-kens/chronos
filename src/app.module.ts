@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { Activity } from './entities/activity.enetity';
+import { Task } from './entities/task.entity';
 import { TimetableModule } from './timetable/timetable.module';
 
 @Module({
@@ -14,9 +15,9 @@ import { TimetableModule } from './timetable/timetable.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'your pass',
+      password: 'p@RRc3L@@dm!n#2170',
       database: 'timetable_db',
-      entities: [Activity,],
+      entities: [Activity, Task],
       synchronize: true,
       logging: true,
     }),

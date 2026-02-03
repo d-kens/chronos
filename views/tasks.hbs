@@ -1,0 +1,35 @@
+<div class="container">
+  <header>
+    <h1>Tasks for {{activity.activity}}</h1>
+    <a href="/timetable" class="btn">Back</a>
+  </header>
+
+  <div style="margin:16px 0; color:#64748b">{{activity.day}} • {{activity.startTime}} - {{activity.endTime}}</div>
+
+  {{#if tasks.length}}
+    <ol class="task-list">
+      {{#each tasks}}
+        <li class="task-item {{#if isDone}}done{{/if}}">
+          <span class="task-desc">{{description}}</span>
+          <span class="task-actions">
+            {{#unless isDone}}
+              <form method="POST" action="/timetable/tasks/{{this.id}}/complete" style="display:inline">
+                <button type="submit" class="task-action-btn">Complete</button>
+              </form>
+              <form method="POST" action="/timetable/tasks/{{this.id}}/carry" style="display:inline">
+                <button type="submit" class="task-action-btn">Carry</button>
+              </form>
+            {{/unless}}
+          </span>
+        </li>
+      {{/each}}
+    </ol>
+  {{else}}
+    <p class="no-tasks">No tasks</p>
+  {{/if}}
+
+  <form method="POST" action="/timetable/activities/{{activity.id}}/tasks" class="task-form" style="margin-top:18px;">
+    <input type="text" name="description" placeholder="Add task..." required>
+    <button type="submit" class="btn btn-primary">Add</button>
+  </form>
+</div>
